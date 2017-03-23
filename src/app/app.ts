@@ -129,9 +129,9 @@ class Tab {
                     <button type="button" class="menu-btn"><span class="menu-text" style="color: grey">Export for Web...</span></button>
                 </li>
                 <li class="menu-separator"></li>
-                <li class="menu-item" (click)="checkForUpdates()">
+                <!--<li class="menu-item" (click)="checkForUpdates()">
                     <button type="button" class="menu-btn"><span class="menu-text">Check for updates...</span></button>
-                </li>
+                </li>-->
                 <li class="menu-item" (click)="openDevTools()">
                     <button type="button" class="menu-btn"><span class="menu-text">Open Developer Tools</span> </button>
                 </li>

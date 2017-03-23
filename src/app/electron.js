@@ -143,15 +143,19 @@ function startMainApplication() {
   });
 
   ipc.on('check-version', event => {
-    /*electronEasyUpdater.versionCheck({
-     url: FEED_VERSION_URL,
-     version: app.getVersion()
-     }, (err, actualVersion) => {
-     if (!err && actualVersion) {
-     newVersion = actualVersion;*/
-    event.sender.send('request-to-update', process.platform);
-    /*}
-     });*/
+    electronEasyUpdater.versionCheck({
+      url: FEED_VERSION_URL,
+      version: app.getVersion()
+    }, (err, actualVersion) => {
+      if (!err && actualVersion) {
+        newVersion = actualVersion;
+        event.sender.send('request-to-update', {
+          platform: process.platform,
+          arch: process.arch,
+          newVersion
+        });
+      }
+    });
   });
 
   ipc.on('prepare-update', (event, version) => {

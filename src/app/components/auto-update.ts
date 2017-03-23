@@ -15,7 +15,7 @@ const ipc = electron.ipcRenderer;
       <div *ngIf = "platform" style = "display: inline;">
           <div class = "label" style="margin-top: 2px;">
               Your current version is too old for automatic update. Please download new version
-              <a href = "#" class = "one" (click) = "goUrl(links[platform])">from here</a> and install it.
+              <a href = "#" class = "one" (click) = "goUrl(links[platform + arch], newVersion)">from here</a> and install it.
           </div>
       </div>
   `
@@ -27,16 +27,21 @@ export class AutoUpdateComponent implements OnInit {
   public max: number = 200;
   public progress: number = 0;
   public platform: string;
+  public arch: string;
+  public newVersion: string;
   public links: any = {
-    linux: 'https://s3-eu-west-1.amazonaws.com/gapminder-offline/0.70.16/Gapminder%20Offline-linux.zip',
-    darwin: 'https://s3-eu-west-1.amazonaws.com/gapminder-offline/0.70.16/Install%20Gapminder%20Offline.dmg',
-    win32: 'https://s3-eu-west-1.amazonaws.com/gapminder-offline/0.70.16/Gapminder%20Offline-win64.zip'
+    linuxx64: 'https://s3-eu-west-1.amazonaws.com/gapminder-offline/#version#/Gapminder%20Offline-linux.zip',
+    darwinx64: 'https://s3-eu-west-1.amazonaws.com/gapminder-offline/#version#/Install%20Gapminder%20Offline.dmg',
+    win32x64: 'https://s3-eu-west-1.amazonaws.com/gapminder-offline/#version#/Gapminder%20Offline-win64.zip',
+    win32ia32: 'https://s3-eu-west-1.amazonaws.com/gapminder-offline/#version#/Gapminder%20Offline-win32.zip',
   };
 
   constructor(private _ngZone: NgZone) {
   }
 
-  public goUrl(link: string) {
+  public goUrl(linkTemplate: string, newVersion: string) {
+    const link = linkTemplate.replace(/#version#/, newVersion);
+
     electron.shell.openExternal(link);
   }
 
@@ -52,13 +57,17 @@ export class AutoUpdateComponent implements OnInit {
       });
     });
 
-    ipc.on('request-to-update', (event, platform) => {
-      this.platform = platform;
-      /*this._ngZone.run(() => {
-       if (version) {
-       this.requestToUpdate = true;
-       }
-       });*/
+    ipc.on('request-to-update', (event, versionDescriptor) => {
+      this._ngZone.run(() => {
+        this.platform = versionDescriptor.platform;
+        this.arch = versionDescriptor.arch;
+        this.newVersion = versionDescriptor.newVersion;
+        /*this._ngZone.run(() => {
+         if (version) {
+         this.requestToUpdate = true;
+         }
+         });*/
+      });
     });
 
     ipc.on('download-progress', (event: any, progress: string) => {
